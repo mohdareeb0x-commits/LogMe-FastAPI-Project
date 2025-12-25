@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary bg-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><h2>LogMe</h2></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="signup.html">Signup</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <div class="bg-gradient bg-primary text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Welcome to LogMe</h1>
+                    <p class="lead mb-4">A secure, modern authentication system with role-based access control built with FastAPI.</p>
+                    <div class="d-flex gap-3">
+                        <a href="signup.html" class="btn btn-light btn-lg">Get Started</a>
+                        <a href="login.html" class="btn btn-outline-light btn-lg">Login</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <div class="display-1 text-opacity-50">🔐</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container py-5">
+        <h2 class="text-center mb-5">Key Features</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="display-6 mb-3 text-primary">🔒</div>
+                        <h5 class="card-title">Secure Authentication</h5>
+                        <p class="card-text">Password hashing with bcrypt and JWT tokens stored in HTTP-only cookies for maximum security.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="display-6 mb-3 text-success">👥</div>
+                        <h5 class="card-title">Role-Based Access</h5>
+                        <p class="card-text">Manage admin and user roles with flexible route protection and automatic redirects.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="display-6 mb-3 text-info">⚡</div>
+                        <h5 class="card-title">Fast & Reliable</h5>
+                        <p class="card-text">Built with FastAPI for high performance with automatic API documentation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card border-0 shadow">
+                        <div class="card-body p-5">
+                            <h3 class="card-title mb-3">About This Project</h3>
+                            <p class="card-text">This project showcases an authenticated FastAPI login system implementing role-based access control (RBAC). It demonstrates user signup with secure password hashing, JWT access and refresh tokens stored in HTTP-only cookies, and protected admin/user routes with redirects based on role. Use the Signup link to create an account, then Login to be redirected to the appropriate dashboard. The code is intentionally minimal for learning — extend it with persistent storage, OAuth2 providers, improved session handling, and security hardening for production.</p>
+                            <a href="signup.html" class="btn btn-primary btn-lg mt-3">Start Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
