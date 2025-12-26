@@ -292,7 +292,7 @@ def user_dashboard(request: Request):
     )
 
 @app.get("/user")
-def admin_dashboard(request: Request, current_user: dict = Depends(require_role("user"))):
+def user_dashboard(request: Request, current_user: dict = Depends(require_role("user"))):
     """User-only dashboard view. Requires `user` role."""
     return templates.TemplateResponse(
         "user.html",
