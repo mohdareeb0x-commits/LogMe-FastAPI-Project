@@ -7,11 +7,9 @@ delegate persistence to SQLAlchemy sessions obtained from
 `app.deps.get_db`.
 """
 
-from fastapi import (FastAPI, HTTPException, Depends, Request, Form, status)
-from fastapi.security import (OAuth2PasswordBearer, OAuth2PasswordRequestForm)
+from fastapi import (FastAPI, HTTPException, Depends, Request, Form)
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import (HTMLResponse, RedirectResponse, JSONResponse)
-from jose import jwt, JWTError
-from app.shemas import UserCreate
 from starlette.status import HTTP_303_SEE_OTHER
 from app.db import engine
 from datetime import datetime, timedelta
@@ -22,19 +20,16 @@ from app.models import (Base, User, Role, UserRole, RefreshToken)
 from app.init_db import create_default_roles
 from app.auth import (
     hash_password, verify_password, 
-    create_access_token, get_current_user, 
+    create_access_token, get_user, 
     require_role, create_refresh_token,
-    hash_token,
+    hash_token, admin_only, user_only,
     REFRESH_KEY, ALGORITHM
 )
 
 app = FastAPI()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 templates = Jinja2Templates(directory="site")
 
 Base.metadata.create_all(bind=engine)
-
-fake_users_db = {}
 
 
 @app.on_event("startup")
@@ -115,7 +110,7 @@ async def signup(request: Request,
 
 
 @app.get("/login.html", response_class=HTMLResponse)
-def signup_page(request: Request):
+def login_page(request: Request):
     """Render the login page."""
     return templates.TemplateResponse(
         "login.html",
@@ -136,15 +131,18 @@ async def login(
     """
 
     user = db.query(User).filter(User.username == form_data.username).first()
-
+    
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=403,
             detail = "Invalid credentials"
         )
     
-    access_token = create_access_token({"sub": str(user.id)})
-    refresh_token = create_refresh_token({"sub": str(user.id)})
+    user_role = db.query(UserRole).filter(UserRole.user_id == user.id).first()
+    role_name = user_role.role.name if user_role else "user"
+    
+    access_token = create_access_token({"sub": str(user.id), "role": role_name})
+    refresh_token = create_refresh_token({"sub": str(user.id), "role": role_name})
 
     refresh_token_db = RefreshToken(
         user_id = user.id, 
@@ -268,15 +266,16 @@ def refresh_token(request: Request, db: Session = Depends(get_db)):
 
     
 @app.get("/admin.html", response_class=HTMLResponse)
-def admin(request: Request):
+def admin_dashboard(request: Request, user = Depends(admin_only)):
     """Render the admin landing page (static HTML)."""
     return templates.TemplateResponse(
         "admin.html",
-        {"request": request}
+        {"request": request, 
+         "user": user}
     )
 
 @app.get("/admin")
-def admin_dashboard(request: Request, current_user: dict = Depends(require_role("admin"))):
+def admin_route(request: Request, current_user: dict = Depends(require_role("admin"))):
     """Admin-only dashboard view. Requires `admin` role."""
     return templates.TemplateResponse(
         "admin.html",
@@ -284,15 +283,18 @@ def admin_dashboard(request: Request, current_user: dict = Depends(require_role(
     )
 
 @app.get("/user.html", response_class=HTMLResponse)
-def user_dashboard(request: Request):
+def user_dashboard(request: Request, user = Depends(user_only)):
     """Return a simple JSON welcome message for authenticated users."""
+    if user.get("role") == None:
+        raise HTTPException(status_code=403, detail="Admins Only")
     return templates.TemplateResponse(
         "user.html",
-        {"request": request}
+        {"request": request, 
+         "user": user}
     )
 
 @app.get("/user")
-def user_dashboard(request: Request, current_user: dict = Depends(require_role("user"))):
+def user_route(request: Request, current_user: dict = Depends(require_role("user"))):
     """User-only dashboard view. Requires `user` role."""
     return templates.TemplateResponse(
         "user.html",

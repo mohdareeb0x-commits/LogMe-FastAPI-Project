@@ -8,8 +8,7 @@ factory `require_role` for enforcing role-based access via cookies.
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from fastapi import HTTPException, Depends, Cookie
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, Depends, Cookie, Request
 import hashlib
 
 ACCESS_KEY = "WbqzN2T8aivotWDrIgTQr"
@@ -19,7 +18,6 @@ REFRESH_TOKEN_EXPIRE_DAYS = 15
 ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def hash_token(token: str) -> str :
@@ -61,7 +59,7 @@ def create_refresh_token(data: dict) -> str:
     return jwt.encode(payload, REFRESH_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(access_token: str = None):
+def get_current_user(request: Request,access_token: str = None):
     """Decode a JWT access token and return a minimal user dict.
 
     Raises `HTTPException(401)` when the token is missing or invalid.
@@ -78,7 +76,24 @@ def get_current_user(access_token: str = None):
         return {"username": username, "role": role}
     
     except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")    
+
+
+def get_user(request: Request):
+    """Decode a JWT access token and return a minimal user dict.
+    Raises `HTTPException(401)` when the token is missing or invalid.
+    """
+    access_token = request.cookies.get("access_token")
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Missing Token")
+    
+    payload = jwt.decode(access_token, ACCESS_KEY, algorithms=[ALGORITHM])
+
+    return {
+        "id" : payload.get("sub"),
+        "role": payload.get("role")
+    }
     
 
 def require_role(required_role):
@@ -104,3 +119,15 @@ def require_role(required_role):
         return current_user
     
     return role_checker
+
+
+def admin_only(user = Depends(get_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admins Only")
+    return user
+
+
+def user_only(user = Depends(get_user)):
+    if user.get("role") == None:
+        raise HTTPException(status_code=403, detail="Users Only")
+    return user
