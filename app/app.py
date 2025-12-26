@@ -22,7 +22,7 @@ from app.auth import (
     hash_password, verify_password, 
     create_access_token, get_user, 
     require_role, create_refresh_token,
-    hash_token, admin_only, user_only,
+    hash_token, admin_only,
     REFRESH_KEY, ALGORITHM
 )
 
@@ -283,8 +283,8 @@ def admin_route(request: Request, current_user: dict = Depends(require_role("adm
     )
 
 @app.get("/user.html", response_class=HTMLResponse)
-def user_dashboard(request: Request, user = Depends(user_only)):
-    """Return a simple JSON welcome message for authenticated users."""
+def user_dashboard(request: Request, user = Depends(get_user)):
+    """Render Blog page for authenticated users."""
     if user.get("role") == None:
         raise HTTPException(status_code=403, detail="Admins Only")
     return templates.TemplateResponse(

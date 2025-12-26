@@ -86,7 +86,7 @@ def get_user(request: Request):
     access_token = request.cookies.get("access_token")
 
     if not access_token:
-        raise HTTPException(status_code=401, detail="Missing Token")
+        raise HTTPException(status_code=401, detail="Not Signed In")
     
     payload = jwt.decode(access_token, ACCESS_KEY, algorithms=[ALGORITHM])
 
@@ -122,12 +122,10 @@ def require_role(required_role):
 
 
 def admin_only(user = Depends(get_user)):
+    """To check if the logged in user has admin role or not 
+    and return outcome."""
+
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admins Only")
     return user
 
-
-def user_only(user = Depends(get_user)):
-    if user.get("role") == None:
-        raise HTTPException(status_code=403, detail="Users Only")
-    return user
